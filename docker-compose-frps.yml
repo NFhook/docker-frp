@@ -1,0 +1,9 @@
+version: "3.7"
+services:
+  frps:
+    image: frps:latest
+    container_name: frps
+    volumes:
+      - ./frps.toml:/etc/frps.toml
+    restart: always
+    network_mode: "host"
