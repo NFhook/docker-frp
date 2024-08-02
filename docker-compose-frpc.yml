@@ -1,0 +1,9 @@
+version: "3.7"
+services:
+  frpc:
+    image: frpc:latest
+    container_name: frpc
+    volumes:
+      - ./frpc.toml:/etc/frpc.toml
+    restart: always
+    network_mode: "host"
