@@ -1,0 +1,13 @@
+FROM golang:1.22 AS building
+
+COPY . /building
+WORKDIR /building
+
+RUN go env -w GOPROXY=https://goproxy.cn,direct && make frpc
+
+FROM alpine:3
+
+COPY --from=building /building/bin/frpc /usr/bin/frpc
+COPY --from=building /building/conf/frpc_full_example.toml /etc/frpc.toml
+RUN export https_proxy="http://10.10.17.125:9890" && export http_proxy="http://10.10.17.125:9890" && apk update && apk add --no-cache tzdata && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+ENTRYPOINT ["/usr/bin/frpc", "-c", "/etc/frpc.toml"]
