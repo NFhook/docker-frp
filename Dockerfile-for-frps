@@ -1,0 +1,13 @@
+FROM golang:1.22 AS building
+
+COPY . /building
+WORKDIR /building
+
+RUN go env -w GOPROXY=https://goproxy.cn,direct && make frps
+
+FROM alpine:3
+
+COPY --from=building /building/bin/frps /usr/bin/frps
+COPY --from=building /building/conf/frps_full_example.toml /etc/frps.toml
+RUN export https_proxy="http://10.10.17.125:9890" && export http_proxy="http://10.10.17.125:9890" && apk update && apk add --no-cache tzdata && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+ENTRYPOINT ["/usr/bin/frps", "-c", "/etc/frps.toml"]
